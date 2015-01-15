@@ -1,0 +1,27 @@
+---
+driver:
+  name: vagrant
+  provider: libvirt
+
+provisioner:
+  name: chef_solo
+
+platforms:
+  - name: centos-6.4
+    driver_config:
+      box_name: 'centos-6.4'
+      box_url: "https://downloads.vortorus.net/vagrant/kvm/centos-64.box"
+
+suites:
+  - name: default
+    steps:
+      - run_list:
+        - recipe[iptables]
+        - recipe[openssh::iptables]
+        - recipe[wakame-vdc]
+        attributes:
+      - run_list:
+        - recipe[iptables]
+        - recipe[openssh::iptables]
+        - recipe[wakame-vdc]
+        attributes:

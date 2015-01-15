@@ -1,0 +1,8 @@
+*nat
+-A POSTROUTING -o eth0 -j MASQUERADE 
+*filter
+-A FORWARD -i br0 -o any -j REJECT --reject-with icmp-port-unreachable 
+-A FORWARD -i any -o br0 -j REJECT --reject-with icmp-port-unreachable 
+-A FORWARD -i br0 -o br0 -j ACCEPT 
+-A FORWARD -s 192.169.3.0/24 -i br0 -o any -j ACCEPT 
+-A FORWARD -d 192.168.3.0/24 -i any -o br0 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT 

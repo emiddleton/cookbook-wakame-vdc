@@ -8,3 +8,5 @@ version          '0.1.0'
 
 depends 'mysql-chef_gem'
 depends 'database'
+depends 'reboot-handler'
+depends 'iptables'
