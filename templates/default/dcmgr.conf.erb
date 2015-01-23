@@ -179,9 +179,9 @@ service_type("std", "StdServiceType") {
 }
 
 service_type("lb", "LbServiceType") {
-  image_id 'wmi-demolb'
+  image_id 'wmi-haproxy1d64'
   instances_network 'nw-demo1'
-  management_network 'nw-demo8'
+  management_network 'nw-demo1'
   host_node_scheduler :LeastUsage
   storage_node_scheduler :LeastUsage
   network_scheduler :VifsRequestParam
@@ -193,5 +193,5 @@ service_type("lb", "LbServiceType") {
 
   # Please specify the addresses that can be referenced from within an instance of the load balancer.
   # amqp_server_uri is saved to userdata in instance of the load balancer.
-  amqp_server_uri 'amqp://example.com/'
+  amqp_server_uri 'amqp://<%= node['wakame-vdc']['lan']['gateway'] %>/'
 }

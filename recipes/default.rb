@@ -96,6 +96,11 @@ when 'rhel', 'fedora'
       source "hva.conf.erb"
       variables netfilter_script_post_flush: "/etc/wakame-vdc/nat-forwarding.sh"
     end
+
+    template "/etc/wakame-vdc/convert_specs/load_balancer.yml" do
+      source "load_balancer.yml.erb"
+    end
+
     template "/etc/wakame-vdc/dcmgr_gui/database.yml" do
       source "database.yml.erb"
       variables password: node['mysql']['server_root_password']
@@ -111,6 +116,10 @@ when 'rhel', 'fedora'
 
     template "/etc/wakame-vdc/dcmgr_gui/load_balancer_spec.yml" do
       source "load_balancer_spec.yml.erb"
+    end
+
+    template "/etc/wakame-vdc/convert_specs/load_balancer.yml" do
+      source "load_balancer.yml.erb"
     end
 
     mysql_service "default" do
