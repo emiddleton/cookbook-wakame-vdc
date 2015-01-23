@@ -18,6 +18,11 @@ config.enable_iptables = true
 config.enable_subnet = false
 config.enable_gre = true
 
+<% if @netfilter_script_post_flush %>
+# setup nat and other things after iptables is flushed
+config.netfilter_script_post_flush = '<%= @netfilter_script_post_flush %>'
+<% end %>
+
 # display netfitler commands
 config.verbose_netfilter = false
 config.verbose_openflow  = false

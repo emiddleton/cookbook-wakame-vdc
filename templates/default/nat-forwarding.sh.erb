@@ -1,0 +1,6 @@
+iptables -t nat -A POSTROUTING -o <%= @gateway_device %> -j MASQUERADE
+iptables -I FORWARD -j ACCEPT -d <%= @bridge_network %> -i any -o <%= @bridge_device %> -m conntrack --ctstate ESTABLISHED,RELATED
+iptables -I FORWARD -j ACCEPT -s <%= @bridge_network %> -i <%= @bridge_device %> -o any
+iptables -I FORWARD -j ACCEPT -i <%= @bridge_device %> -o <%= @bridge_device %>
+iptables -I FORWARD -j REJECT -i any -o <%= @bridge_device %>
+iptables -I FORWARD -j REJECT -i <%= @bridge_device %> -o any

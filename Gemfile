@@ -13,3 +13,5 @@ gem 'berkshelf'
 #   gem "vagrant-berkshelf", github: "berkshelf/vagrant-berkshelf"
 #   gem "vagrant-omnibus", github: "schisamo/vagrant-omnibus"
 # end
+
+gem 'busser-serverspec'

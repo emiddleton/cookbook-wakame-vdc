@@ -16,12 +16,8 @@ suites:
   - name: default
     steps:
       - run_list:
-        - recipe[iptables]
-        - recipe[openssh::iptables]
         - recipe[wakame-vdc]
         attributes:
       - run_list:
-        - recipe[iptables]
-        - recipe[openssh::iptables]
         - recipe[wakame-vdc]
         attributes:

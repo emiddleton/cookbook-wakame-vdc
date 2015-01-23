@@ -12,10 +12,6 @@ include_recipe "reboot-handler"
 case node['platform_family']
 when 'rhel', 'fedora'
 
-  service 'iptables' do
-    action [:enable, :start]
-  end
-
   remote_file '/etc/yum.repos.d/wakame-vdc.repo' do
     source "https://raw.githubusercontent.com/axsh/wakame-vdc/master/rpmbuild/wakame-vdc.repo"
     mode '0644'
@@ -73,19 +69,20 @@ when 'rhel', 'fedora'
       action :enable
     end
 
-    template "/etc/sysconfig/network-scripts/ifcfg-eth0" do
-      source "ifcfg-eth0.erb"
-      notifies :restart, "service[network]", :immediately
-    end
-
     template "/etc/sysconfig/network-scripts/ifcfg-br0" do
       source "ifcfg-br0.erb"
       variables ipaddr: node['wakame-vdc']['lan']['router'],
+        netmask: node['wakame-vdc']['lan']['netmask'],
         dns: node['wakame-vdc']['lan']['dns']
       notifies :restart, "service[network]", :immediately
     end
 
-    iptables_rule "nat"
+    template "/etc/wakame-vdc/nat-forwarding.sh" do
+      source "nat-forwarding.sh.erb"
+      variables bridge_network: "192.168.3.0/24",
+        bridge_device: "br0",
+        gateway_device: "eth0"
+    end
 
     template "/etc/wakame-vdc/dcmgr.conf" do
       source "dcmgr.conf.erb"
@@ -93,6 +90,7 @@ when 'rhel', 'fedora'
     end
     template "/etc/wakame-vdc/hva.conf" do
       source "hva.conf.erb"
+      variables netfilter_script_post_flush: "/etc/wakame-vdc/nat-forwarding.sh"
     end
     template "/etc/wakame-vdc/dcmgr_gui/database.yml" do
       source "database.yml.erb"
@@ -307,6 +305,5 @@ when 'rhel', 'fedora'
       action [:enable, :start]
     end
 
-    iptables_rule "vdc-webui"
   end
 end
