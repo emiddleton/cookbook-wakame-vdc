@@ -46,9 +46,12 @@ when 'rhel', 'fedora'
   # base system packages
   package "vim"
 
+  package "git"
+
   if node['kernel']['modules'].include?('vznetdev')
     yum_package "wakame-vdc-webui-vmapp-config"
 
+    # ruby dependency
     yum_package "libyaml"
 
     remote_file "#{Chef::Config[:file_cache_path]}/wakame-vdc-ruby-2.0.0.247.axsh0-1.x86_64.rpm" do
@@ -88,6 +91,7 @@ when 'rhel', 'fedora'
       source "dcmgr.conf.erb"
       variables password: node['mysql']['server_root_password']
     end
+
     template "/etc/wakame-vdc/hva.conf" do
       source "hva.conf.erb"
       variables netfilter_script_post_flush: "/etc/wakame-vdc/nat-forwarding.sh"
@@ -96,12 +100,15 @@ when 'rhel', 'fedora'
       source "database.yml.erb"
       variables password: node['mysql']['server_root_password']
     end
+
     template "/etc/wakame-vdc/dcmgr_gui/dcmgr_gui.yml" do
       source "dcmgr_gui.yml.erb"
     end
+
     template "/etc/wakame-vdc/dcmgr_gui/instance_spec.yml" do
       source "instance_spec.yml.erb"
     end
+
     template "/etc/wakame-vdc/dcmgr_gui/load_balancer_spec.yml" do
       source "load_balancer_spec.yml.erb"
     end
@@ -109,6 +116,8 @@ when 'rhel', 'fedora'
     mysql_service "default" do
       action :create
     end
+
+    include_recipe 'wakame-vdc::test'
 
     mysql_database "wakame_dcmgr" do
       connection(
