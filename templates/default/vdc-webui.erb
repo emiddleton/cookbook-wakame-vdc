@@ -4,9 +4,8 @@
 # Comment out to run the vdc init script
 RUN=yes
 
-## agent params
-AMQP_ADDR=<%= @amqp_addr %>
-AMQP_PORT=<%= @amqp_port %>
-NODE_ID=<%= @node_id %>
-
-#OPENVZ_FAILURE_RECOVERY=true
+## rack params
+RACK_ENV=development
+BIND_ADDR=<%= @bind_addr %>
+PORT=<%= @port %>
+#UNICORN_CONF=/etc/wakame-vdc/unicorn-common.conf

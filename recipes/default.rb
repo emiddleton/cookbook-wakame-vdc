@@ -127,13 +127,6 @@ when 'rhel', 'fedora'
       action :nothing
     end
 
-    # Register the HVA
-    template "/etc/default/vdc-hva" do
-      source "vdc-hva.erb"
-      variables node_id: 'demo1'
-      notifies :run, 'execute[vdc-manage host add demo1]', :immediately
-    end
-
     execute "vdc-manage host add demo1" do
       command <<-CMD
         /opt/axsh/wakame-vdc/dcmgr/bin/vdc-manage host add hva.demo1 \
@@ -302,6 +295,32 @@ when 'rhel', 'fedora'
 
     service 'rabbitmq-server' do
       action [:enable, :start]
+    end
+
+    template "/etc/default/vdc-dcmgr" do
+      source "vdc-dcmgr.erb"
+      variables bind_addr: node['wakame-vdc']['dcmgr']['address'],
+        port: node['wakame-vdc']['dcmgr']['port']
+    end
+
+    template "/etc/default/vdc-collector" do
+      source "vdc-collector.erb"
+      variables amqp_addr: node['wakame-vdc']['amqp']['address'],
+        amqp_port: node['wakame-vdc']['amqp']['port']
+    end
+
+    template "/etc/default/vdc-hva" do
+      source "vdc-hva.erb"
+      variables node_id: 'demo1',
+        amqp_addr: node['wakame-vdc']['amqp']['address'],
+        amqp_port: node['wakame-vdc']['amqp']['port']
+      notifies :run, 'execute[vdc-manage host add demo1]', :immediately
+    end
+
+    template "/etc/default/vdc-webui" do
+      source "vdc-webui.erb"
+      variables bind_addr: node['wakame-vdc']['webui']['address'],
+        port: node['wakame-vdc']['webui']['port']
     end
 
     service 'vdc-dcmgr' do
