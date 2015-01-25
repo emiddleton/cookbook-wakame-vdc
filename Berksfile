@@ -2,6 +2,6 @@ source "https://supermarket.getchef.com"
 
 metadata
 
-cookbook "mysql-chef_gem"
-cookbook "database"
+cookbook "database", "=2.3.1"
+
 cookbook "reboot-handler", git: 'https://github.com/emiddleton/cookbook-reboot-handler.git'

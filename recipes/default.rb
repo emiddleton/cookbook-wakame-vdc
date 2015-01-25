@@ -87,10 +87,6 @@ when 'rhel', 'fedora'
         gateway_device: "eth0"
     end
 
-    mysql_service "default" do
-      action :create
-    end
-
     template "/etc/wakame-vdc/dcmgr.conf" do
       source "dcmgr.conf.erb"
       variables password: node['mysql']['server_root_password']
@@ -99,10 +95,6 @@ when 'rhel', 'fedora'
     template "/etc/wakame-vdc/hva.conf" do
       source "hva.conf.erb"
       variables netfilter_script_post_flush: "/etc/wakame-vdc/nat-forwarding.sh"
-    end
-
-    template "/etc/wakame-vdc/convert_specs/load_balancer.yml" do
-      source "load_balancer.yml.erb"
     end
 
     template "/etc/wakame-vdc/dcmgr_gui/database.yml" do
@@ -124,6 +116,10 @@ when 'rhel', 'fedora'
 
     template "/etc/wakame-vdc/convert_specs/load_balancer.yml" do
       source "load_balancer.yml.erb"
+    end
+
+    mysql_service "default" do
+      action :create
     end
 
     include_recipe 'wakame-vdc::test'

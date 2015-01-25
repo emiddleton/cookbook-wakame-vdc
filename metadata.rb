@@ -6,6 +6,5 @@ description      'Installs/Configures wakame-vdc'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
 version          '0.1.0'
 
-depends 'mysql-chef_gem'
 depends 'database'
 depends 'reboot-handler'
