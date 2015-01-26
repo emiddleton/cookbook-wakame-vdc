@@ -1,0 +1,5 @@
+DCMGR_HOST=127.0.0.1
+account_id=a-shpoolxx
+hypervisor=openvz
+image_id=wmi-centos64
+RETRY_WAIT_SEC=200
