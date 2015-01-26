@@ -7,8 +7,9 @@ define :machine_image,
 
   uri = URI.parse(params[:url])
   file_name = File.basename(uri.path)
+  to_notify = params[:notifies]
 
-  remote_file "/var/lib/wakame-vdc/images/#{file_name}" do
+  remote_file params[:path] do
     source params[:url]
     checksum params[:sha246]
     notifies :run, "execute[vdc-manage backupobject add --uuid bo-#{params[:name]}]", :immediately
@@ -40,6 +41,7 @@ define :machine_image,
         --display-name #{params[:name]}
     CMD
     action :nothing
+    notifies(*to_notify) if to_notify
   end
 
 end

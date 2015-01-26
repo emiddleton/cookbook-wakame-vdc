@@ -137,7 +137,7 @@ when 'rhel', 'fedora'
     execute "dcmgr rake db:up" do
       cwd "/opt/axsh/wakame-vdc/dcmgr"
       command "/opt/axsh/wakame-vdc/ruby/bin/rake db:up"
-      notifies :run, "execute[vdc-manage network add --uuid nw-demo1]", :immediately
+      notifies :run, "execute[vdc-manage host add demo1]", :immediately
       action :nothing
     end
 
@@ -154,11 +154,13 @@ when 'rhel', 'fedora'
           --force
       CMD
       action :nothing
+      notifies :create, "directory[/var/lib/wakame-vdc/images]", :immediately
     end
 
     # Download and register a machine image
     directory "/var/lib/wakame-vdc/images" do 
       recursive true
+      action :nothing
       notifies :run, 'execute[vdc-manage backupstorage add]', :immediately
     end
 
@@ -172,58 +174,69 @@ when 'rhel', 'fedora'
           --description "storage on the local filesystem"
       CMD
       action :nothing
+      notifies :create, "remote_file[/var/lib/wakame-vdc/images/lb-centos6-stud.x86_64.openvz.md.raw.gz]", :immediately
     end
 
     machine_image "haproxy1d64" do
       service_type 'lb'
       description "lb-centos6-stud.x86_64.openvz.md.raw.gz local"
+      path "/var/lib/wakame-vdc/images/lb-centos6-stud.x86_64.openvz.md.raw.gz"
       url "https://downloads.vortorus.net/wakame-vdc/images/lb-centos6-stud.x86_64.openvz.md.raw.gz"
       sha246 "93b4d9cecfc3494ac55f230c670dd60df57e1b61227f9e614a406cdf6683c36d"
       md5 "3a243bc4b420e6f7f42cf518249803c7"
       size "238364391"
       allocated "1073741824"
       root_device "uuid:0ceef42a-3542-4e94-ace9-18cd7a54542a"
+      notifies :create, "remote_file[/var/lib/wakame-vdc/images/lbnode.x86_64.openvz.md.raw.gz]", :immediately
     end
 
     machine_image "lbnode1d64" do
       service_type 'lb'
       description "lbnode.x86_64.openvz.md.raw.gz local"
+      path "/var/lib/wakame-vdc/images/lbnode.x86_64.openvz.md.raw.gz"
       url "https://downloads.vortorus.net/wakame-vdc/images/lbnode.x86_64.openvz.md.raw.gz"
       sha246 "db58e56984aa4909cb8fbd9ccb56a692f0bcfd819b1a72b650619ed4030af385"
       md5 "dbde35c9f8b8cec303da890eb729d0b9"
       size "230467339"
       allocated "1073741824"
       root_device "uuid:4cb57dee-b541-493f-afa6-d84be44ef2af"
+      notifies :create, "remote_file[/var/lib/wakame-vdc/images/vanilla.x86_64.openvz.md.raw.gz]", :immediately
     end
 
     machine_image "vanilla1d64" do
       description "vanilla.x86_64.openvz.md.raw.gz local"
+      path "/var/lib/wakame-vdc/images/vanilla.x86_64.openvz.md.raw.gz"
       url "https://downloads.vortorus.net/wakame-vdc/images/vanilla.x86_64.openvz.md.raw.gz"
       sha246 "8c6e906340bb6bc9050be1ef2932c0304e62a3bdf8b23451077519c2b984d870"
       md5 "8cc56d7bea81ecd1b6609de25bf74c03"
       size "277540653"
       allocated "4294967296"
       root_device "uuid:4e8dab0a-5b0b-43bf-ae0b-9794bedd74ef"
+      notifies :create, "remote_file[/var/lib/wakame-vdc/images/centos-6.4.x86_64.openvz.md.raw.gz]", :immediately
     end
 
     machine_image "centos64" do
       description "CentOS 6.4"
+      path "/var/lib/wakame-vdc/images/centos-6.4.x86_64.openvz.md.raw.gz"
       url "https://downloads.vortorus.net/wakame-vdc/images/centos-6.4.x86_64.openvz.md.raw.gz"
       sha246 "caaec809de5d1dc1063dfa6e56fef41507aeae169ff2183ca5e1f25b00ad2921"
       md5 "222188f4182429f901b55edf4de14a70"
       size "277423041"
       allocated "4294967296"
       root_device "uuid:0a5283db-4f6c-4142-8a44-ea79132d5208"
+      notifies :create, "remote_file[/var/lib/wakame-vdc/images/ubuntu-lucid-kvm-md-32.raw.gz]", :immediately
     end
 
     machine_image "lucid5d" do
       description "Ubuntu 10.04 (Lucid Lynx)"
+      path "/var/lib/wakame-vdc/images/ubuntu-lucid-kvm-md-32.raw.gz"
       url "http://dlc.wakame.axsh.jp.s3.amazonaws.com/demo/vmimage/ubuntu-lucid-kvm-md-32.raw.gz"
       sha246 "faa9c75fdfd9cce3b1bebfd5813e5f945e82f9b1117e521d7b1151641bc52ada"
       md5 "1f841b195e0fdfd4342709f77325ce29"
       size "152659010"
       allocated "657457152"
       root_device "uuid:148bc5df-3fc5-4e93-8a16-7328907cb1c0"
+      notifies :run, "execute[vdc-manage network add --uuid nw-demo1]", :immediately
     end
 
     # Register a network
@@ -315,12 +328,14 @@ when 'rhel', 'fedora'
       source "vdc-dcmgr.erb"
       variables bind_addr: node['wakame-vdc']['dcmgr']['address'],
         port: node['wakame-vdc']['dcmgr']['port']
+      notifies :restart, 'service[vdc-dcmgr]', :immediately
     end
 
     template "/etc/default/vdc-collector" do
       source "vdc-collector.erb"
       variables amqp_addr: node['wakame-vdc']['amqp']['address'],
         amqp_port: node['wakame-vdc']['amqp']['port']
+      notifies :restart, 'service[vdc-collector]', :immediately
     end
 
     template "/etc/default/vdc-hva" do
@@ -328,13 +343,14 @@ when 'rhel', 'fedora'
       variables node_id: 'demo1',
         amqp_addr: node['wakame-vdc']['amqp']['address'],
         amqp_port: node['wakame-vdc']['amqp']['port']
-      notifies :run, 'execute[vdc-manage host add demo1]', :immediately
+      notifies :restart, 'service[vdc-hva]', :immediately
     end
 
     template "/etc/default/vdc-webui" do
       source "vdc-webui.erb"
       variables bind_addr: node['wakame-vdc']['webui']['address'],
         port: node['wakame-vdc']['webui']['port']
+      notifies :restart, 'service[vdc-webui]', :immediately
     end
 
     service 'vdc-dcmgr' do
