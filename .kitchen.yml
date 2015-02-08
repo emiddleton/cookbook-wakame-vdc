@@ -7,13 +7,21 @@ provisioner:
   name: chef_solo
 
 platforms:
-  - name: centos-6.4
+  - name: centos-64
     driver_config:
       box_name: 'centos-6.4'
-      box_url: "https://downloads.vortorus.net/vagrant/kvm/centos-64.box"
+      box_url: "https://downloads.vortorus.net/vagrant/packer_centos-6.4-x86_64-minimal_libvirt.box"
 
 suites:
-  - name: default
+  - name: suite_1
+    steps:
+      - run_list:
+        - recipe[wakame-vdc]
+        attributes:
+      - run_list:
+        - recipe[wakame-vdc]
+        attributes:
+  - name: suite_2
     steps:
       - run_list:
         - recipe[wakame-vdc]

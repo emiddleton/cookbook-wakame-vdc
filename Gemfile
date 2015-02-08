@@ -14,4 +14,6 @@ gem 'berkshelf'
 #   gem "vagrant-omnibus", github: "schisamo/vagrant-omnibus"
 # end
 
+#gem 'busser-mussel', github: 'emiddleton/busser-mussel'
 gem 'busser-mussel'
+gem 'busser-serverspec'
